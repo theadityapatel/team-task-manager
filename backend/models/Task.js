@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const taskSchema = new mongoose.Schema({
-  title: String,
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
   description: String,
   status: {
     type: String,
@@ -14,8 +18,14 @@ const taskSchema = new mongoose.Schema({
     default: "Low"
   },
   dueDate: Date,
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
   project: { type: mongoose.Schema.Types.ObjectId, ref: "Project" }
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model("Task", taskSchema);

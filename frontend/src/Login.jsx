@@ -19,7 +19,7 @@ export default function Login() {
       setToken(res.data.token);
 
       navigate("/dashboard");
-    } catch (err) {
+    } catch {
       setMsg("Invalid email or password");
     } finally {
       setLoading(false);

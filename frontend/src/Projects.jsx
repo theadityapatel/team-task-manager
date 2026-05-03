@@ -25,7 +25,22 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    fetchProjects();
+    let isMounted = true;
+
+    const loadProjects = async () => {
+      try {
+        const res = await API.get("/projects");
+        if (isMounted) setProjects(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    loadProjects();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

@@ -1,38 +1,31 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const getUser = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
+};
+
+const getInitialUser = () => {
+  const user = getUser();
+
+  return {
+    name: user?.name || "",
+    email: user?.email || "Not available",
+    role: user?.role || "Member",
+  };
+};
 
 export default function Profile() {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    role: "",
-  });
-
-  // 🔹 Decode user from token
-  const getUser = () => {
-    const token = localStorage.getItem("token");
-    if (!token) return null;
-
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload;
-    } catch {
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    const u = getUser();
-    if (u) {
-      setUser({
-        name: u.name,
-        email: u.email || "Not available",
-        role: u.role || "Member",
-      });
-    }
-  }, []);
+  const [user] = useState(getInitialUser);
 
   return (
     <div className="min-h-screen bg-gray-100">

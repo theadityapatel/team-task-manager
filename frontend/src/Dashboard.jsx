@@ -2,11 +2,23 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "./api";
 
+const getUserName = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return "User";
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.name || "User";
+  } catch {
+    return "User";
+  }
+};
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
-  const [userName, setUserName] = useState("");
+  const [userName] = useState(getUserName);
   const [showModal, setShowModal] = useState(false);
 
   const [newTask, setNewTask] = useState({
@@ -15,19 +27,6 @@ export default function Dashboard() {
     status: "To Do",
     dueDate: "",
   });
-
-  // 🔹 USER FROM TOKEN
-  const getUser = () => {
-    const token = localStorage.getItem("token");
-    if (!token) return "User";
-
-    try {
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      return payload.name;
-    } catch {
-      return "User";
-    }
-  };
 
   // 🔹 FETCH TASKS
   const fetchTasks = async () => {
@@ -77,8 +76,22 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    setUserName(getUser());
-    fetchTasks();
+    let isMounted = true;
+
+    const loadTasks = async () => {
+      try {
+        const res = await API.get("/tasks");
+        if (isMounted) setTasks(res.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    loadTasks();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // 🔹 COUNTS

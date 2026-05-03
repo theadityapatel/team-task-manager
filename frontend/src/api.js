@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "https://team-task-manager-production-a182.up.railway.app/api";
+
 const API = axios.create({
-  baseURL: "team-task-manager-production-a182.up.railway.app"
+  baseURL: API_BASE_URL
 });
 
 export const setToken = (token) => {
@@ -11,5 +15,9 @@ export const setToken = (token) => {
     delete API.defaults.headers.common["Authorization"];
   }
 };
+
+if (typeof localStorage !== "undefined") {
+  setToken(localStorage.getItem("token"));
+}
 
 export default API;
